@@ -8,7 +8,7 @@ def test_bbc_news_number_of_articles():
     headlines, urls, dates = scrapenews.get_bbc_news('transport', 2)
     assert len(headlines) == len(urls) == len(dates) and len(headlines) > 0
 
-def test_convert_bbc_news():
+def test_convert_scraped_news():
     """ Data transformation as expected """
     headlines = ['Headline A', 'Headline B']
     urls = ['www.a.com', 'www.b.com']
@@ -22,7 +22,7 @@ def test_convert_bbc_news():
         'url': 'www.b.com',
         'date': dateutil.parser.parse('2017-06-19T12:33:02Z')
         }]
-    data_returned = scrapenews.convert_bbc_news(headlines, urls, dates)
+    data_returned = scrapenews.convert_scraped_news(headlines, urls, dates)
     assert data_returned == data_expected
 
 def test_filter_yesterday():
@@ -40,3 +40,9 @@ def test_filter_yesterday():
     ]
     data_output = scrapenews.filter_yesterday(data_input)
     assert len(data_output) == 1 and data_output[0]['headline'] == 'Yesterday'
+
+def test_get_guardian_news():
+    """ Check data is returned and that the number of headlines, urls and dates
+    all match """
+    headlines, urls, dates = scrapenews.get_guardian_news()
+    assert len(headlines) == len(urls) == len(dates) and len(headlines) > 0

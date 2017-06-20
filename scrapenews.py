@@ -24,7 +24,7 @@ def get_bbc_news(keyword, n_articles):
                        'dl/dd/time[@class="display-date"]/@datetime')
     return(headlines, urls, dates)
 
-def convert_bbc_news(headlines, urls, dates):
+def convert_scraped_news(headlines, urls, dates):
     """ Convert the three lists into a JSON like list of dictionaries """
     data = []
     for i in range(len(headlines)):
@@ -34,10 +34,11 @@ def convert_bbc_news(headlines, urls, dates):
         data.append(d)
     return(data)
 
-def filter_yesterday(bbc_data):
-    """ Returns only bbc news articles published yesterday """
+def filter_yesterday(news_data):
+    """ Returns only news articles published yesterday. Takes data in the
+    format produced by convert_scraped_news() """
     new_data = []
-    for item in bbc_data:
+    for item in news_data:
         yesterday = datetime.date.today() - datetime.timedelta(days = 1)
         if item['date'].date() == yesterday:
             new_data.append(item)
@@ -57,12 +58,34 @@ def scrape_bbc_yesterday_multiple_keywords():
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
     return(data)
 
+def get_guardian_news():
+    """ Collect the headlines and dates and article url for news on the
+    gardian website uk transport section """
+    guardian_url = 'https://www.theguardian.com/uk/transport'
+    page = requests.get(guardian_url)
+    tree = html.fromstring(page.content)
+    headlines = tree.xpath('//div[@class="fc-item__container"]/' +
+                           'a[@class = "u-faux-block-link__overlay js-headline-text"]/' +
+                           'text()')
+    urls = tree.xpath('//div[@class="fc-item__container"]/' +
+                           'a[@class = "u-faux-block-link__overlay js-headline-text"]/' +
+                           '@href')
+    dates = tree.xpath('//div[@class="fc-item__container"]/' +
+                       'div[@class="fc-item__content"]/aside/time/@datetime')
+    return(headlines, urls, dates)
+
 def push_to_mongo(data, collection_name):
     db = MongoClient().test # db is named test
     if len(data) > 0:
         result = db[collection_name].insert_many(data)
         print('inserted ' + str(len(result.inserted_ids)))
+    else:
+        print('No articles yesterday to insert')
 
 if __name__ == '__main__':
     bbc_articles = scrape_bbc_yesterday_multiple_keywords()
     push_to_mongo(bbc_articles, 'news.bbc')
+    a,b,c = get_guardian_news()
+    guardian_data = convert_scraped_news(a,b,c)
+    guardian_data = filter_yesterday(guardian_data)
+    push_to_mongo(guardian_data, 'news.guardian')
