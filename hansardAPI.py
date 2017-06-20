@@ -28,10 +28,11 @@ def get_hansard_data(hansard_url, min_date, max_date):
     validate_date(max_date)
     print(hansard_url)
     counter = 0
-    print("getting result " + str(counter))
+    print("getting first page")
 
     r = requests.get(hansard_url, params = {'min-date': min_date,
-                                            'max-date': max_date})
+                                            'max-date': max_date},
+        timeout = 60)
     print(r.url)
     print('status code ' + str(r.status_code))
     
@@ -46,17 +47,20 @@ def get_hansard_data(hansard_url, min_date, max_date):
     to see all fields """
     result = r.json()['result']
     results = result['items']
+    num_results = result['totalResults']
 
     more_results = 'next' in result
     while more_results == True:
-        print("getting result " + str(counter))
-        r = requests.get(result['next'])
+        print("getting result " + str(counter) + str(" of ") + 
+              str(num_results // 10))
+        r = requests.get(result['next'], timeout = 60)
         if r.status_code // 100 != 2:
             more_results = False
         else:
             counter += 1
             result = r.json()['result']
             results += result['items']
+            num_results = result['totalResults']
             more_results = 'next' in result
     return(results)
 
