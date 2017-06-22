@@ -35,11 +35,11 @@ def get_hansard_data(hansard_url, min_date, max_date):
         timeout = 60)
     print(r.url)
     print('status code ' + str(r.status_code))
-    
+
     #https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     if r.status_code // 100 != 2:
         return()
-    counter +=1 
+    counter +=1
 
     """result is a dictionary. The key 'result' has the data, the other keys
     are meta data about the request. 'items'contains a list of all the data
@@ -51,7 +51,7 @@ def get_hansard_data(hansard_url, min_date, max_date):
 
     more_results = 'next' in result
     while more_results == True:
-        print("getting result " + str(counter) + str(" of ") + 
+        print("getting result " + str(counter) + str(" of ") +
               str(num_results // 10))
         r = requests.get(result['next'], timeout = 60)
         if r.status_code // 100 != 2:
@@ -65,7 +65,7 @@ def get_hansard_data(hansard_url, min_date, max_date):
     return(results)
 
 def convert_dict_values(d):
-    """ Convert from strings to dates, integers and booleans for a dictionary 
+    """ Convert from strings to dates, integers and booleans for a dictionary
     from the hansard api """
     for k, v in d.items():
         if type(v) == dict:

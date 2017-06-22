@@ -74,18 +74,8 @@ def get_guardian_news():
                        'div[@class="fc-item__content"]/aside/time/@datetime')
     return(headlines, urls, dates)
 
-def push_to_mongo(data, collection_name):
-    db = MongoClient().test # db is named test
-    if len(data) > 0:
-        result = db[collection_name].insert_many(data)
-        print('inserted ' + str(len(result.inserted_ids)))
-    else:
-        print('No articles yesterday to insert')
-
-if __name__ == '__main__':
-    bbc_articles = scrape_bbc_yesterday_multiple_keywords()
-    push_to_mongo(bbc_articles, 'news.bbc')
-    a,b,c = get_guardian_news()
-    guardian_data = convert_scraped_news(a,b,c)
-    guardian_data = filter_yesterday(guardian_data)
-    push_to_mongo(guardian_data, 'news.guardian')
+    def scrape_guardian_yesterday():
+        a,b,c = get_guardian_news()
+        guardian_data = convert_scraped_news(a,b,c)
+        guardian_data = filter_yesterday(guardian_data)
+        return(guardian_data)
