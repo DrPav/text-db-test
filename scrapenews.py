@@ -1,4 +1,4 @@
-from lxml import html
+convert_scraped_newsfrom lxml import html
 import requests
 from dateutil.parser import parse
 import datetime
@@ -51,7 +51,7 @@ def scrape_bbc_yesterday_multiple_keywords():
     for keyword in keywords:
         print(keyword)
         headlines, urls, dates = get_bbc_news(keyword, 5)
-        d = convert_bbc_news(headlines, urls, dates)
+        d = convert_scraped_news(headlines, urls, dates)
         data.extend(filter_yesterday(d))
     # Drop duplicates
     # https://stackoverflow.com/questions/7090758/python-remove-duplicate-dictionaries-from-a-list
