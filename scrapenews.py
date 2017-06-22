@@ -1,4 +1,4 @@
-convert_scraped_newsfrom lxml import html
+from lxml import html
 import requests
 from dateutil.parser import parse
 import datetime
