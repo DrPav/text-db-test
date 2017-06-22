@@ -1,4 +1,4 @@
 pymongo
-dateutil
+python-dateutil
 requests
 lxml
