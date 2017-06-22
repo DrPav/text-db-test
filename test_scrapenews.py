@@ -46,3 +46,9 @@ def test_get_guardian_news():
     all match """
     headlines, urls, dates = scrapenews.get_guardian_news()
     assert len(headlines) == len(urls) == len(dates) and len(headlines) > 0
+
+def test_get_guardian_news():
+    """ Check data is returned and that 3 pages returns more data than 1 """
+    guardian_articles_1 = scrapenews.scrape_guardian_pages(1)
+    guardian_articles_4 = scrapenews.scrape_guardian_pages(3)
+    assert len(guardian_articles_1) > 0 and len(guardian_articles_4) > len(guardian_articles_1)

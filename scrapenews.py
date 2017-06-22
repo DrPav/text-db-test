@@ -4,6 +4,8 @@ from dateutil.parser import parse
 import datetime
 from pymongo import MongoClient
 
+keywords = ['transport', 'road', 'rail', 'dft', 'airport', 'freight',
+'car', 'train', 'plane', 'maritime', 'walk', 'cycle' ]
 
 def get_bbc_news(keyword, n_articles):
     """ Collect up to n_articles articles headlines with their url and date.
@@ -45,8 +47,6 @@ def filter_yesterday(news_data):
     return(new_data)
 
 def scrape_bbc_yesterday_multiple_keywords():
-    keywords = ['transport', 'road', 'rail', 'dft', 'airport', 'freight',
-    'car', 'train', 'plane', 'maritime', 'walk', 'cycle' ]
     data = []
     for keyword in keywords:
         print(keyword)
@@ -58,10 +58,21 @@ def scrape_bbc_yesterday_multiple_keywords():
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
     return(data)
 
-def get_guardian_news():
+def scrape_bbc_pages_multiple_keywords(n_pages):
+    data = []
+    for keyword in keywords:
+        print(keyword)
+        headlines, urls, dates = get_bbc_news(keyword, n_pages)
+        d = convert_bbc_news(headlines, urls, dates)
+        data.extend(d)
+    # Drop duplicates
+    # https://stackoverflow.com/questions/7090758/python-remove-duplicate-dictionaries-from-a-list
+    data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
+    return(data)
+
+def get_guardian_news(guardian_url = 'https://www.theguardian.com/uk/transport'):
     """ Collect the headlines and dates and article url for news on the
     gardian website uk transport section """
-    guardian_url = 'https://www.theguardian.com/uk/transport'
     page = requests.get(guardian_url)
     tree = html.fromstring(page.content)
     headlines = tree.xpath('//div[@class="fc-item__container"]/' +
@@ -74,8 +85,20 @@ def get_guardian_news():
                        'div[@class="fc-item__content"]/aside/time/@datetime')
     return(headlines, urls, dates)
 
-    def scrape_guardian_yesterday():
-        a,b,c = get_guardian_news()
-        guardian_data = convert_scraped_news(a,b,c)
-        guardian_data = filter_yesterday(guardian_data)
-        return(guardian_data)
+def scrape_guardian_yesterday():
+    a,b,c = get_guardian_news()
+    guardian_data = convert_scraped_news(a,b,c)
+    guardian_data = filter_yesterday(guardian_data)
+    return(guardian_data)
+
+def scrape_guardian_pages(n_pages):
+    """ Scrape through guardian transport pages """
+    data = []
+    for i in range(n_pages):
+        url = 'https://www.theguardian.com/uk/transport?page=' + str(i + 1)
+        headlines, urls, dates = get_guardian_news(url)
+        d = convert_scraped_news(headlines, urls, dates)
+        data.extend(d)
+    # Drop duplicates
+    data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
+    return(data)
