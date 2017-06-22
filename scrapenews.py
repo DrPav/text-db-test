@@ -49,7 +49,6 @@ def filter_yesterday(news_data):
 def scrape_bbc_yesterday_multiple_keywords():
     data = []
     for keyword in keywords:
-        print(keyword)
         headlines, urls, dates = get_bbc_news(keyword, 5)
         d = convert_scraped_news(headlines, urls, dates)
         data.extend(filter_yesterday(d))

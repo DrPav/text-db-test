@@ -16,10 +16,10 @@ def connect_to_mongo():
 
 def push_to_mongo(db, data, collection_name):
     """ Send data to mongo if not empty """
-    print("final data")
     if len(data) > 0:
         result = db[collection_name].insert_many(data)
-        print('inserted ' + str(len(result.inserted_ids)))
+        print('inserted ' + str(len(result.inserted_ids)) +
+              " to " + collection_name)
     else:
         print('No articles to insert')
 
@@ -39,6 +39,5 @@ def fetch_hansard(mongo_db, start_date, end_date):
 
 if __name__ == '__main__':
     db = connect_to_mongo()
-    print(db)
     fetch_news(db, 50)
-    fetch_hansard(db, '2017-01-01', str(dateitme.date.today()))
+    fetch_hansard(db, '2017-01-01', str(datetime.date.today()))
