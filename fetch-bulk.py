@@ -35,7 +35,7 @@ def fetch_hansard(mongo_db, start_date, end_date):
                                       'hansard.').replace('.json', '')
         data = hansardAPI.get_hansard_data(url, start_date, end_date)
         data = hansardAPI.convert_all_values(data)
-        push_to_mongo(mongodb, data, collection_name)
+        push_to_mongo(mongo_db, data, collection_name)
 
 if __name__ == '__main__':
     db = connect_to_mongo()

@@ -34,7 +34,6 @@ def get_hansard_data(hansard_url, min_date, max_date):
                                             'max-date': max_date},
         timeout = 60)
     print(r.url)
-    print('status code ' + str(r.status_code))
 
     #https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     if r.status_code // 100 != 2:
