@@ -96,6 +96,7 @@ def scrape_guardian_pages(n_pages = 45):
     """ Scrape through guardian transport pages """
     data = []
     for i in range(n_pages):
+        print("Getting guardian transport page" + str(i))
         url = 'https://www.theguardian.com/uk/transport?page=' + str(i + 1)
         headlines, urls, dates = get_guardian_news(url)
         d = convert_scraped_news(headlines, urls, dates)
