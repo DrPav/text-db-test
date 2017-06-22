@@ -61,7 +61,6 @@ def scrape_bbc_yesterday_multiple_keywords():
 def scrape_bbc_pages_multiple_keywords(n_pages):
     data = []
     for keyword in keywords:
-        print(keyword)
         headlines, urls, dates = get_bbc_news(keyword, n_pages)
         d = convert_scraped_news(headlines, urls, dates)
         data.extend(d)

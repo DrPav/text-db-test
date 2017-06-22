@@ -33,7 +33,7 @@ def fetch_hansard(mongodb):
     """ Script to run daily to fetch yesterdays hansard data.
     Takes data on hansard api with yesterdays date and then send to mongodb """
 
-    yesterday = str(dateitme.date.today() - datetime.timedelta(days = 1))
+    yesterday = str(datetime.date.today() - datetime.timedelta(days = 1))
     for url in hansardAPI.hansard_urls:
         collection_name = url.replace('http://lda.data.parliament.uk/',
                                       'hansard.').replace('.json', '')
