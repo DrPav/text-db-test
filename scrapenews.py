@@ -7,14 +7,14 @@ from pymongo import MongoClient
 keywords = ['transport', 'road', 'rail', 'dft', 'airport', 'freight',
 'car', 'train', 'plane', 'maritime', 'walk', 'cycle' ]
 
-def get_bbc_news(keyword, n_articles):
+def get_bbc_news(keyword, page_num = 1):
     """ Collect up to n_articles articles headlines with their url and date.
     It uses the bbc search page and filters to news articles. It is not sorted
     in alphabetical order so 50 articles are collected to cover the last few
     days """
 
     request_url = ('http://www.bbc.co.uk/search?q=' + keyword +
-        '&filter=news#page=' + str(n_articles // 10)) # 10 articles per page
+        '&filter=news&page=' + str(page_num)) # 10 articles per page
     page = requests.get(request_url)
     tree = html.fromstring(page.content)
     headlines = tree.xpath('//ol[@class="search-results results"]/li/article/' +
@@ -49,20 +49,23 @@ def filter_yesterday(news_data):
 def scrape_bbc_yesterday_multiple_keywords():
     data = []
     for keyword in keywords:
-        headlines, urls, dates = get_bbc_news(keyword, 5)
-        d = convert_scraped_news(headlines, urls, dates)
-        data.extend(filter_yesterday(d))
+        for page_num in [1,2,3]:
+            headlines, urls, dates = get_bbc_news(keyword, page_num)
+            d = convert_scraped_news(headlines, urls, dates)
+            data.extend(filter_yesterday(d))
     # Drop duplicates
     # https://stackoverflow.com/questions/7090758/python-remove-duplicate-dictionaries-from-a-list
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
     return(data)
 
-def scrape_bbc_pages_multiple_keywords(n_pages):
+def scrape_bbc_pages_multiple_keywords(n_pages = 30):
     data = []
     for keyword in keywords:
-        headlines, urls, dates = get_bbc_news(keyword, n_pages)
-        d = convert_scraped_news(headlines, urls, dates)
-        data.extend(d)
+        for page_num in range(n_pages):
+            print("Getting BBC " + keyword + " page " + str(page_num))
+            headlines, urls, dates = get_bbc_news(keyword, page_num + 1)
+            d = convert_scraped_news(headlines, urls, dates)
+            data.extend(d)
     # Drop duplicates
     # https://stackoverflow.com/questions/7090758/python-remove-duplicate-dictionaries-from-a-list
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
@@ -89,7 +92,7 @@ def scrape_guardian_yesterday():
     guardian_data = filter_yesterday(guardian_data)
     return(guardian_data)
 
-def scrape_guardian_pages(n_pages):
+def scrape_guardian_pages(n_pages = 45):
     """ Scrape through guardian transport pages """
     data = []
     for i in range(n_pages):

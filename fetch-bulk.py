@@ -23,10 +23,10 @@ def push_to_mongo(db, data, collection_name):
     else:
         print('No articles to insert')
 
-def fetch_news(mongo_db, n_pages):
-    bbc_articles = scrapenews.scrape_bbc_pages_multiple_keywords(n_pages)
+def fetch_news(mongo_db):
+    bbc_articles = scrapenews.scrape_bbc_pages_multiple_keywords()
     push_to_mongo(mongo_db, bbc_articles, 'news.bbc')
-    guardian_articles = scrapenews.scrape_guardian_pages(n_pages)
+    guardian_articles = scrapenews.scrape_guardian_pages()
     push_to_mongo(mongo_db, guardian_articles, 'news.guardian')
 
 def fetch_hansard(mongo_db, start_date, end_date):
@@ -39,5 +39,5 @@ def fetch_hansard(mongo_db, start_date, end_date):
 
 if __name__ == '__main__':
     db = connect_to_mongo()
-    #fetch_news(db, 50)
+    fetch_news(db)
     hansardAPI.scrape_all_hansard(db)
