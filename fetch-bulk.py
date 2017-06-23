@@ -40,4 +40,4 @@ def fetch_hansard(mongo_db, start_date, end_date):
 if __name__ == '__main__':
     db = connect_to_mongo()
     fetch_news(db)
-    hansardAPI.scrape_all_hansard(db)
+    hansardAPI.fetch_hansard(db, '2017-05-01', '2017-05-31')
