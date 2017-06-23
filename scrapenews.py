@@ -32,7 +32,8 @@ def convert_scraped_news(headlines, urls, dates):
     for i in range(len(headlines)):
         d = {'headline': headlines[i],
              'url': urls[i],
-             'date': parse(dates[i])}
+             'date': parse(dates[i])
+            }
         data.append(d)
     return(data)
 
@@ -40,11 +41,18 @@ def filter_yesterday(news_data):
     """ Returns only news articles published yesterday. Takes data in the
     format produced by convert_scraped_news() """
     new_data = []
+    yesterday = datetime.date.today() - datetime.timedelta(days = 1)
     for item in news_data:
-        yesterday = datetime.date.today() - datetime.timedelta(days = 1)
         if item['date'].date() == yesterday:
             new_data.append(item)
     return(new_data)
+
+def add_type_source(news_data, source):
+    for i, item in enumerate(news_data):
+        news_data[i] = {'type': 'news',
+                        'source': source,
+                        'item:': item}
+    return(news_data)
 
 def scrape_bbc_yesterday_multiple_keywords():
     data = []
@@ -56,6 +64,7 @@ def scrape_bbc_yesterday_multiple_keywords():
     # Drop duplicates
     # https://stackoverflow.com/questions/7090758/python-remove-duplicate-dictionaries-from-a-list
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
+    data = add_type_source(data, 'bbc')
     return(data)
 
 def scrape_bbc_pages_multiple_keywords(n_pages = 30):
@@ -69,6 +78,7 @@ def scrape_bbc_pages_multiple_keywords(n_pages = 30):
     # Drop duplicates
     # https://stackoverflow.com/questions/7090758/python-remove-duplicate-dictionaries-from-a-list
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
+    data = add_type_source(data, 'bbc')
     return(data)
 
 def get_guardian_news(guardian_url = 'https://www.theguardian.com/uk/transport'):
@@ -90,6 +100,7 @@ def scrape_guardian_yesterday():
     a,b,c = get_guardian_news()
     guardian_data = convert_scraped_news(a,b,c)
     guardian_data = filter_yesterday(guardian_data)
+    guardian_data = add_type_source(guardian_data, 'guardian')
     return(guardian_data)
 
 def scrape_guardian_pages(n_pages = 45):
@@ -99,8 +110,9 @@ def scrape_guardian_pages(n_pages = 45):
         print("Getting guardian transport page" + str(i))
         url = 'https://www.theguardian.com/uk/transport?page=' + str(i + 1)
         headlines, urls, dates = get_guardian_news(url)
-        d = convert_scraped_news(headlines, urls, dates)
+        d = convert_scraped_news(headlines, urls, dates, 'guardian')
         data.extend(d)
     # Drop duplicates
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]
+    data = add_type_source(data, 'guardian')
     return(data)

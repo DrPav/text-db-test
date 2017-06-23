@@ -76,23 +76,16 @@ def get_hansard_data(hansard_url, min_date, max_date):
             results += result['items']
             num_results = result['totalResults']
             more_results = 'next' in result
+    # Fill in type and source
+    for i, result in enumerate(results):
+        results[i] = {'type': "hansard",
+                      'source': hansard_url,
+                      'item': result }
+
+
     return(results)
 
-def convert_dict_values(d):
-    """ Convert from strings to dates, integers and booleans for a dictionary
-    from the hansard api """
-    for k, v in d.items():
-        if type(v) == dict:
-            if '_datatype' in v:
-                if v['_datatype'] == 'dateTime':
-                    v['_value'] = parse(v['_value'])
-                elif v['_datatype'] == 'boolean':
-                    v['_value'] = (v['_value'][0] == 't')
-                elif v['_datatype'] == 'integer':
-                    v['_value'] = int(v['_value'])
-            else:
-                convert_dict_values(v)
-    return(d)
+
 
 def convert_all_values(list_of_dicts):
     """ Convert all datatypes in entire list of dicts read from hansard API"""
