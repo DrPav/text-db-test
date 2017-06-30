@@ -5,8 +5,10 @@ import datetime
 from pymongo import MongoClient
 import logging
 
+
 keywords = ['transport', 'road', 'rail', 'dft', 'airport', 'freight',
-'car', 'train', 'plane', 'maritime', 'walk', 'cycle' ]
+            'car', 'train', 'plane', 'maritime', 'walk', 'cycle']
+
 
 def get_bbc_news(keyword, page_num = 1):
     """ Collect up to n_articles articles headlines with their url and date.
@@ -15,7 +17,7 @@ def get_bbc_news(keyword, page_num = 1):
     days """
 
     request_url = ('http://www.bbc.co.uk/search?q=' + keyword +
-        '&filter=news&page=' + str(page_num)) # 10 articles per page
+                    '&filter=news&page=' + str(page_num)) # 10 articles per page
     logging.debug('Requesting ' + request_url)
     page = requests.get(request_url)
     tree = html.fromstring(page.content)
@@ -65,7 +67,7 @@ def scrape_bbc_yesterday_multiple_keywords():
     data = []
     for keyword in keywords:
         for page_num in [1,2,3]:
-            logging.info('Page ' + str(page_num) +
+            logging.info('BBC Page ' + str(page_num) +
                          ', Search Term: ' + keyword)
             headlines, urls, dates = get_bbc_news(keyword, page_num)
             d = convert_scraped_news(headlines, urls, dates)
@@ -82,7 +84,7 @@ def scrape_bbc_pages_multiple_keywords(n_pages = 30):
     data = []
     for keyword in keywords:
         for page_num in range(n_pages):
-            ogging.info('Page ' + str(page_num) +
+            logging.info('Page ' + str(page_num) +
                          ', Search Term: ' + keyword)
             headlines, urls, dates = get_bbc_news(keyword, page_num + 1)
             d = convert_scraped_news(headlines, urls, dates)
@@ -97,7 +99,7 @@ def scrape_bbc_pages_multiple_keywords(n_pages = 30):
 def get_guardian_news(guardian_url = 'https://www.theguardian.com/uk/transport'):
     """ Collect the headlines and dates and article url for news on the
     gardian website uk transport section """
-    logging.debug('Requesting ' + request_url)
+    logging.debug('Requesting ' + guardian_url)
     page = requests.get(guardian_url)
     tree = html.fromstring(page.content)
     headlines = tree.xpath('//div[@class="fc-item__container"]/' +
@@ -123,10 +125,10 @@ def scrape_guardian_pages(n_pages = 45):
     logging.info('Number of guardian pages to fetch: ' + str(n_pages))
     data = []
     for i in range(n_pages):
-        print("Getting guardian transport page" + str(i))
+        logging.info("Getting guardian transport page" + str(i))
         url = 'https://www.theguardian.com/uk/transport?page=' + str(i + 1)
         headlines, urls, dates = get_guardian_news(url)
-        d = convert_scraped_news(headlines, urls, dates, 'guardian')
+        d = convert_scraped_news(headlines, urls, dates)
         data.extend(d)
     # Drop duplicates
     data = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in data)]

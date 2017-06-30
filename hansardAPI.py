@@ -1,6 +1,7 @@
 import requests
 import datetime
 from dateutil.parser import parse
+import logging
 
 hansard_urls = [
         'http://lda.data.parliament.uk/bills.json',
@@ -41,14 +42,14 @@ def get_hansard_data(hansard_url, min_date, max_date):
     to the max date (inlcuding those dates) """
     validate_date(min_date)
     validate_date(max_date)
-    print(hansard_url)
+    logging.info(hansard_url)
     counter = 0
-    print("getting first page")
+    logging.info("getting first page")
 
     r = requests.get(hansard_url, params = {'min-date': min_date,
                                             'max-date': max_date},
         timeout = 60)
-    print(r.url)
+    logging.info(r.url)
 
     #https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     if r.status_code // 100 != 2:
@@ -65,7 +66,7 @@ def get_hansard_data(hansard_url, min_date, max_date):
 
     more_results = 'next' in result
     while more_results == True:
-        print("getting result " + str(counter) + str(" of ") +
+        logging.info("getting result " + str(counter) + str(" of ") +
               str(num_results // 10))
         r = requests.get(result['next'], timeout = 60)
         if r.status_code // 100 != 2:
@@ -85,11 +86,10 @@ def get_hansard_data(hansard_url, min_date, max_date):
 
     return(results)
 
-
-
 def convert_all_values(list_of_dicts):
     """ Convert all datatypes in entire list of dicts read from hansard API"""
     new_list = []
+    logging.debug('Converting datatypes')
     for i in list_of_dicts:
         new_list.append(convert_dict_values(i))
     return(new_list)
